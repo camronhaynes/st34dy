@@ -512,6 +512,8 @@ h2.section-title:first-child { margin-top: 0; }
     <div class="zone-pill" data-zone="feet"><div class="zone-name">Feet</div><div class="zone-count" id="zc-feet">0</div></div>
   </div>
 
+  <div id="todayZone" onclick="goToTodayExercises()" style="font-size:16px;font-weight:600;color:var(--accent);margin-bottom:16px;padding:16px;background:var(--surface);border:1px solid var(--accent);border-radius:8px;text-align:center;cursor:pointer;"></div>
+
   <div class="schedule-block" data-time="morning">
     <h3>WAKE</h3>
     <div class="card">
@@ -544,7 +546,6 @@ h2.section-title:first-child { margin-top: 0; }
     <div class="card">
       <div class="card-header" onclick="toggle(this)"><h3>4. 3R — Zone Rotation</h3><span class="zone-tag">20-25 min</span></div>
       <div class="card-body">
-        <div id="todayZone" style="font-size:15px;font-weight:600;color:var(--accent);margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:8px;text-align:center;"></div>
         <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Override with <strong style="color:var(--accent)">SYMPTOMS</strong> tab if something is screaming.</div>
         <div class="schedule-item" data-dow="1"><span class="num">Mon</span> Z3+Z1 — Psoas + Adductors</div>
         <div class="schedule-item" data-dow="2"><span class="num">Tue</span> Z2 — SI / Deep Rotators</div>
@@ -2477,10 +2478,38 @@ function show(id) {
 
 function toggle(el) { el.closest('.card').classList.toggle('open'); }
 
+function goToTodayExercises() {
+  show('exercises');
+  if(window._todayFilter) filterZone(window._todayFilter);
+}
+
 function filterZone(zone) {
-  document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('active'));
-  if(event && event.target) event.target.classList.add('active');
-  // For now just shows the zone filter state — full exercise cards will be ported
+  document.querySelectorAll('.zone-btn').forEach(b => {
+    b.classList.remove('active');
+    if((zone === 'all' && b.textContent === 'ALL') ||
+       (zone === 'zone1' && b.textContent === 'ADDUCTORS') ||
+       (zone === 'zone2' && b.textContent.includes('SI')) ||
+       (zone === 'zone3' && b.textContent === 'PSOAS') ||
+       (zone === 'zone4' && b.textContent === 'QUADS') ||
+       (zone === 'zone5' && b.textContent === 'HAMS') ||
+       (zone === 'zone6' && b.textContent === 'CALVES') ||
+       (zone === 'zone7' && b.textContent === 'SHINS'))
+      b.classList.add('active');
+  });
+  document.querySelectorAll('#exercises .card').forEach(function(card) {
+    if(zone === 'all' || card.dataset.zone === zone) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('#exercises .section-title').forEach(function(title) {
+    if(zone === 'all' || title.dataset.zone === zone) {
+      title.style.display = '';
+    } else {
+      title.style.display = 'none';
+    }
+  });
 }
 
 // ==================== TODAY'S ZONE ====================
@@ -2496,11 +2525,10 @@ function updateTodayZone() {
     0: {label:'REST DAY', filter:'all'}
   };
   var today = zones[dow] || zones[0];
+  window._todayFilter = today.filter;
   var el = document.getElementById('todayZone');
   if(el) {
-    el.textContent = today.label;
-    el.style.cursor = 'pointer';
-    el.onclick = function(){ show('exercises'); filterZone(today.filter); };
+    el.innerHTML = today.label + '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">TAP TO START \u2192 exercises</div>';
   }
   // Highlight today's row in the rotation
   document.querySelectorAll('.schedule-item[data-dow]').forEach(function(row){
