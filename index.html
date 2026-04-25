@@ -544,13 +544,14 @@ h2.section-title:first-child { margin-top: 0; }
     <div class="card">
       <div class="card-header" onclick="toggle(this)"><h3>4. 3R — Zone Rotation</h3><span class="zone-tag">20-25 min</span></div>
       <div class="card-body">
-        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Follow today's zone. Override with <strong style="color:var(--accent)">SYMPTOMS</strong> tab if something is screaming.</div>
-        <div class="schedule-item"><span class="num">Mon</span> Z3+Z1 — Psoas + Adductors</div>
-        <div class="schedule-item"><span class="num">Tue</span> Z2 — SI / Deep Rotators</div>
-        <div class="schedule-item"><span class="num">Wed</span> Z4+Z5 — Quads + Hamstrings</div>
-        <div class="schedule-item"><span class="num">Thu</span> Z3+Z2 — Psoas + Rotators</div>
-        <div class="schedule-item"><span class="num">Fri</span> Z6+Z7+Z1 — Calves + Shins + Adductors</div>
-        <div class="schedule-item"><span class="num">Sat</span> Whatever's talking</div>
+        <div id="todayZone" style="font-size:15px;font-weight:600;color:var(--accent);margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:8px;text-align:center;"></div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Override with <strong style="color:var(--accent)">SYMPTOMS</strong> tab if something is screaming.</div>
+        <div class="schedule-item" data-dow="1"><span class="num">Mon</span> Z3+Z1 — Psoas + Adductors</div>
+        <div class="schedule-item" data-dow="2"><span class="num">Tue</span> Z2 — SI / Deep Rotators</div>
+        <div class="schedule-item" data-dow="3"><span class="num">Wed</span> Z4+Z5 — Quads + Hamstrings</div>
+        <div class="schedule-item" data-dow="4"><span class="num">Thu</span> Z3+Z2 — Psoas + Rotators</div>
+        <div class="schedule-item" data-dow="5"><span class="num">Fri</span> Z6+Z7+Z1 — Calves + Shins + Adductors</div>
+        <div class="schedule-item" data-dow="6"><span class="num">Sat</span> Whatever's talking</div>
         <div style="font-size:12px;color:var(--text-dim);margin-top:8px;">Pick 4-5 exercises from today's zones. Full Recruit-Retain-Release. Crocodile breaths between. Log each zone after.</div>
       </div>
     </div>
@@ -2482,8 +2483,40 @@ function filterZone(zone) {
   // For now just shows the zone filter state — full exercise cards will be ported
 }
 
+// ==================== TODAY'S ZONE ====================
+function updateTodayZone() {
+  var dow = new Date().getDay(); // 0=Sun,1=Mon...
+  var zones = {
+    1: {label:'TODAY: Z3+Z1 — Psoas + Adductors', filter:'zone3'},
+    2: {label:'TODAY: Z2 — SI / Deep Rotators', filter:'zone2'},
+    3: {label:'TODAY: Z4+Z5 — Quads + Hamstrings', filter:'zone4'},
+    4: {label:'TODAY: Z3+Z2 — Psoas + Rotators', filter:'zone3'},
+    5: {label:'TODAY: Z6+Z7+Z1 — Calves + Shins + Adductors', filter:'zone6'},
+    6: {label:'TODAY: Symptom-Targeted (flex day)', filter:'all'},
+    0: {label:'REST DAY', filter:'all'}
+  };
+  var today = zones[dow] || zones[0];
+  var el = document.getElementById('todayZone');
+  if(el) {
+    el.textContent = today.label;
+    el.style.cursor = 'pointer';
+    el.onclick = function(){ show('exercises'); filterZone(today.filter); };
+  }
+  // Highlight today's row in the rotation
+  document.querySelectorAll('.schedule-item[data-dow]').forEach(function(row){
+    if(parseInt(row.dataset.dow) === dow) {
+      row.style.background = 'var(--surface2)';
+      row.style.borderRadius = '6px';
+      row.style.padding = '6px 8px';
+      row.style.fontWeight = '600';
+      row.style.color = 'var(--accent)';
+    }
+  });
+}
+
 // ==================== INIT ====================
 updateTimeBlock();
+updateTodayZone();
 setInterval(updateTimeBlock, 60000);
 loadWeekCounts();
 </script>
