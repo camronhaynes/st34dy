@@ -621,14 +621,14 @@ h2.section-title:first-child { margin-top: 0; }
 <div id="symptoms" class="page">
   <h2 class="section-title">What are you feeling?</h2>
   <div class="symptom-map">
-    <div class="symptom-row" onclick="show('exercises');filterZone('zone3')"><div class="feel">Involuntary kegel / BC tension</div><div class="exercises">Pelvic Tuck → Sumo Squat → Side Lunge</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('zone2')"><div class="feel">Scrotal nerve pain</div><div class="exercises">Pigeon → Pelvic Tuck → Hips Flexed</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('zone2')"><div class="feel">SI joint stiffness</div><div class="exercises">Pigeon → Extended Hips → Hips Flexed</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('zone5')"><div class="feel">Diffuse leg / hamstring tension</div><div class="exercises">Forward Bend Wide v2 → Side Squat → Pigeon</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('all')"><div class="feel">General pelvic compression</div><div class="exercises">Pelvic Tuck → Sumo Squat → Pigeon → Forward Bend Wide</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('zone3')"><div class="feel">Low back tightness</div><div class="exercises">Pelvic Tuck → Sliding Split → Quads Central</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('zone6')"><div class="feel">Heel / shaft nerve line</div><div class="exercises">Pigeon → Pelvic Tuck → Belt Calf → Belt Shin</div></div>
-    <div class="symptom-row" onclick="show('exercises');filterZone('all')"><div class="feel">Perineum / scrotum / sides of shaft</div><div class="exercises">Pelvic Tuck → Sliding Split → Pigeon → Sumo Squat → Extended Hips → Fwd Bend Wide → Hips Flexed</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone3','zone1'])"><div class="feel">Involuntary kegel / BC tension</div><div class="exercises">Pelvic Tuck → Sumo Squat → Side Lunge</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone2','zone3'])"><div class="feel">Scrotal nerve pain</div><div class="exercises">Pigeon → Pelvic Tuck → Hips Flexed</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone2'])"><div class="feel">SI joint stiffness</div><div class="exercises">Pigeon → Extended Hips → Hips Flexed</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone5','zone1','zone2'])"><div class="feel">Diffuse leg / hamstring tension</div><div class="exercises">Forward Bend Wide v2 → Side Squat → Pigeon</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone3','zone1','zone2'])"><div class="feel">General pelvic compression</div><div class="exercises">Pelvic Tuck → Sumo Squat → Pigeon → Forward Bend Wide</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone3','zone4'])"><div class="feel">Low back tightness</div><div class="exercises">Pelvic Tuck → Sliding Split → Quads Central</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone2','zone3','zone6','zone7'])"><div class="feel">Heel / shaft nerve line</div><div class="exercises">Pigeon → Pelvic Tuck → Belt Calf → Belt Shin</div></div>
+    <div class="symptom-row" onclick="symptomFilter(['zone3','zone2','zone1'])"><div class="feel">Perineum / scrotum / sides of shaft</div><div class="exercises">Pelvic Tuck → Sliding Split → Pigeon → Sumo Squat → Extended Hips → Fwd Bend Wide → Hips Flexed</div></div>
   </div>
   <div class="note">Tap a symptom to see the exercises. Log each one after you do it.</div>
 </div>
@@ -2446,6 +2446,11 @@ function toggle(el) { el.closest('.card').classList.toggle('open'); }
 function goToTodayExercises() {
   show('exercises');
   if(window._todayFilter) filterMultiZone(window._todayFilter);
+}
+
+function symptomFilter(zones) {
+  show('exercises');
+  filterMultiZone(zones);
 }
 
 function filterMultiZone(zones) {
