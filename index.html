@@ -2480,7 +2480,34 @@ function toggle(el) { el.closest('.card').classList.toggle('open'); }
 
 function goToTodayExercises() {
   show('exercises');
-  if(window._todayFilter) filterZone(window._todayFilter);
+  if(window._todayFilter) filterMultiZone(window._todayFilter);
+}
+
+function filterMultiZone(zones) {
+  if(zones.includes('all')) { filterZone('all'); return; }
+  // Deactivate all filter buttons, activate matching ones
+  document.querySelectorAll('.zone-btn').forEach(b => {
+    b.classList.remove('active');
+    var map = {'ADDUCTORS':'zone1','SI / ROTATORS':'zone2','PSOAS':'zone3','QUADS':'zone4','HAMS':'zone5','CALVES':'zone6','SHINS':'zone7','ALL':'all'};
+    if(zones.includes(map[b.textContent])) b.classList.add('active');
+  });
+  document.querySelectorAll('#exercises .card').forEach(function(card) {
+    if(zones.includes(card.dataset.zone)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('#exercises .section-title').forEach(function(title) {
+    if(title.dataset.zone && zones.includes(title.dataset.zone)) {
+      title.style.display = '';
+    } else if(title.dataset.zone) {
+      title.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('#exercises .info-block').forEach(function(block) {
+    block.style.display = 'none';
+  });
 }
 
 function filterZone(zone) {
@@ -2516,13 +2543,13 @@ function filterZone(zone) {
 function updateTodayZone() {
   var dow = new Date().getDay(); // 0=Sun,1=Mon...
   var zones = {
-    1: {label:'TODAY: Z3+Z1 — Psoas + Adductors', filter:'zone3'},
-    2: {label:'TODAY: Z2 — SI / Deep Rotators', filter:'zone2'},
-    3: {label:'TODAY: Z4+Z5 — Quads + Hamstrings', filter:'zone4'},
-    4: {label:'TODAY: Z3+Z2 — Psoas + Rotators', filter:'zone3'},
-    5: {label:'TODAY: Z6+Z7+Z1 — Calves + Shins + Adductors', filter:'zone6'},
-    6: {label:'TODAY: Symptom-Targeted (flex day)', filter:'all'},
-    0: {label:'REST DAY', filter:'all'}
+    1: {label:'TODAY: Z3+Z1 — Psoas + Adductors', filter:['zone3','zone1']},
+    2: {label:'TODAY: Z2 — SI / Deep Rotators', filter:['zone2']},
+    3: {label:'TODAY: Z4+Z5 — Quads + Hamstrings', filter:['zone4','zone5']},
+    4: {label:'TODAY: Z3+Z2 — Psoas + Rotators', filter:['zone3','zone2']},
+    5: {label:'TODAY: Z6+Z7+Z1 — Calves + Shins + Adductors', filter:['zone6','zone7','zone1']},
+    6: {label:'TODAY: Symptom-Targeted (flex day)', filter:['all']},
+    0: {label:'REST DAY', filter:['all']}
   };
   var today = zones[dow] || zones[0];
   window._todayFilter = today.filter;
