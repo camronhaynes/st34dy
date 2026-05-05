@@ -206,10 +206,12 @@ nav button.active {
   background: var(--accent);
   color: var(--bg);
 }
-.log-btn.logged {
+.log-btn.logged, .log-btn:disabled {
   background: var(--green);
   color: var(--bg);
   border-color: var(--green);
+  opacity: 0.7;
+  cursor: default;
 }
 
 /* Time-aware glow */
@@ -2364,11 +2366,15 @@ let sb;
 try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.log('Supabase not connected yet'); }
 
 // ==================== ZONE LOGGING ====================
+const _loggedToday = new Set();
+
 async function logZone(zone, exercise) {
   if (!sb || SUPABASE_KEY === 'ANON_KEY_HERE') {
     alert('Supabase not connected yet');
     return;
   }
+  const key = zone + '::' + exercise;
+  if (_loggedToday.has(key)) return; // prevent duplicates
   const btn = event.target;
   btn.textContent = '...';
   const { error } = await sb.from('zone_log').insert({
@@ -2383,7 +2389,34 @@ async function logZone(zone, exercise) {
   }
   btn.textContent = 'LOGGED ✓';
   btn.classList.add('logged');
+  btn.disabled = true;
+  _loggedToday.add(key);
   loadWeekCounts();
+}
+
+// On load, check what's already logged today and disable those buttons
+async function markTodayLogged() {
+  if (!sb || SUPABASE_KEY === 'ANON_KEY_HERE') return;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const { data } = await sb.from('zone_log').select('zone,exercise').gte('logged_at', today.toISOString());
+  if (!data) return;
+  data.forEach(r => {
+    _loggedToday.add(r.zone + '::' + r.exercise);
+  });
+  // Disable already-logged buttons
+  document.querySelectorAll('.log-btn').forEach(btn => {
+    const onclick = btn.getAttribute('onclick') || '';
+    const match = onclick.match(/logZone\('(\w+)',\s*'(.+?)'\)/);
+    if (match) {
+      const key = match[1] + '::' + match[2];
+      if (_loggedToday.has(key)) {
+        btn.textContent = 'LOGGED ✓';
+        btn.classList.add('logged');
+        btn.disabled = true;
+      }
+    }
+  });
 }
 
 async function loadWeekCounts() {
@@ -2579,6 +2612,7 @@ updateTimeBlock();
 updateTodayZone();
 setInterval(updateTimeBlock, 60000);
 loadWeekCounts();
+markTodayLogged();
 </script>
 
 </body>
